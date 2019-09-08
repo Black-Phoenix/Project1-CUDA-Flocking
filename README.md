@@ -97,3 +97,8 @@ Increasing the block size has an effect on the performance upto some point. Afte
 ### Interesting error
 During the implementation, a lot of interesting bug showed. One of my favorate is shown below. This was caused because of an error in the reshuffeling portion of the coherent grid method.
 ![Fail](images/spinning_circles.gif)
+## Questions and Answers
+* For each implementation, how does changing the number of boids affect performance? Why do you think this is?
+* For each implementation, how does changing the block count and block size affect performance? Why do you think this is?
+* For the coherent uniform grid: did you experience any performance improvements with the more coherent uniform grid? Was this the outcome you expected? Why or why not?
+* Did changing cell width and checking 27 vs 8 neighboring cells affect performance? Why or why not? Be careful: it is insufficient (and possibly incorrect) to say that 27-cell is slower simply because there are more cells to check!
