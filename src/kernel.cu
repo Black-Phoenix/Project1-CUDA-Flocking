@@ -429,8 +429,20 @@ __device__ void computeNeighborList(int gridResolution, float cellWidth, glm::ve
 		neighbors[6] = wrap(neighbors[2] + gridResolution * gridResolution, 0, gridCount);
 		neighbors[7] = wrap(neighbors[3] + gridResolution * gridResolution, 0, gridCount);
 	}
-
 }
+
+__device__ void computeNeighborListAll(int gridResolution, float cellWidth, glm::vec3 &cell_pos, int *neighbors, int middlePos) {
+
+	int gridCount = gridResolution * gridResolution*gridResolution;
+
+	// x axis lower half
+	int n = 0;
+	for (int x = -1; x <= 1; x++)
+		for (int y = -1; y <= 1; y++)
+			for(int z = -1;z <= 1;z++)
+				neighbors[n++] = wrap(middlePos + x + y*gridResolution + z * gridResolution*gridResolution, 0, gridCount);
+}
+
 __global__ void kernUpdateVelNeighborSearchScattered(int N, int gridResolution, glm::vec3 gridMin,
 	float inverseCellWidth, float cellWidth, int *gridCellStartIndices, int *gridCellEndIndices,
 	int *particleArrayIndices, glm::vec3 *pos, glm::vec3 *vel1, glm::vec3 *vel2) {
@@ -445,16 +457,18 @@ __global__ void kernUpdateVelNeighborSearchScattered(int N, int gridResolution, 
 	int gridCell = gridIndex3Dto1D(glm::floor(correctedPos), gridResolution);
 	glm::vec3 new_vel = vel1[particleArrayIndices[index]];
 	// Identify neighboring cells
-	int neighbors[8] = {gridCell};
-	computeNeighborList(gridResolution, cellWidth, correctedPos, neighbors);
-
+	//int neighbors[8] = {gridCell};
+	//computeNeighborList(gridResolution, cellWidth, correctedPos, neighbors);
+	// Identify all neighbors
+	int neighbors[27];
+	computeNeighborListAll(gridResolution, cellWidth, correctedPos, neighbors, gridCell);
 	// Boid variables
 	glm::vec3 perceived_center(0.0f, 0.0f, 0.0f);
 	glm::vec3 c(0.0f, 0.0f, 0.0f);
 	glm::vec3 perceived_velocity(0.0f, 0.0f, 0.0f);
 	int num_neighbors1 = 0, num_neighbors3 = 0;
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 27; i++) {
 		int neighborIndex = neighbors[i];
 		int start = gridCellStartIndices[neighborIndex];
 		int end = gridCellEndIndices[neighborIndex];
