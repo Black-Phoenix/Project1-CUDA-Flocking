@@ -6,7 +6,7 @@ Project 1 - Flocking**
 * Tested on: Windows 10, i7-7700HQ @ 2.8GHz (3.8 Boost) 32GB, External GTX 1080Ti, 11G (My personal laptop)
 
 ## Boids Flocking Overview
-[Boids Algorithm example](images/med_obj_count.gif)
+![Boids Algorithm example](images/med_obj_count.gif)
 In the Boids flocking simulation, particles representing birds or fish
 (boids) move around the simulation space according to three rules:
 
@@ -91,19 +91,19 @@ This method builds upon the previous method, with the main difference being it m
 ## Results and Performance Analysis
 ### Results
 Below is a video of the particles flocking.
-[Flocking boids](images/med_obj_count_v2.gif)
+![Flocking boids](images/med_obj_count_v2.gif)
 ### Analysis
 To analyze the performance of the 3 methods, FPS data was collected for various numbers of boids. These plots are shown below. One was collected with the visualization turned on while the other had the visualization turned off.
-[FPS with visualization](images/plots/with_viz.png)
-[FPS without visualization](images/plots/without_viz.png)
+![FPS with visualization](images/plots/with_viz.png)
+![FPS without visualization](images/plots/without_viz.png)
 Next, data was collected for different block sizes, to see the difference it has
-[FPS vs Block size with visualization](images/plots/block_size_with_viz.png)
+![FPS vs Block size with visualization](images/plots/block_size_with_viz.png)
 Finally, data was collected for different neighborhood sizes, 8 and 27 cells around the current boid.
-[FPS vs neighborhood without visualization](images/plots/neighbors_without_viz.png)
+![FPS vs neighborhood without visualization](images/plots/neighbors_without_viz.png)
 ## Interesting Observations
 ### Change in the number of object
 As expected, coherent grid method performs the best when the number of boids increase. For lower counts of boids, the coherent grid method performs similarly to the uniform grid method. For very low values (like 1000), not many boids have a single cell within their distance of influence so it takes a long time to form clusters, shown below
-[Low count boids](images/low_obj_count.gif)
+![Low count boids](images/low_obj_count.gif)
 ### Block size increase 
 Increasing the block size has an effect on the performance up to some point. After which, the performance does not benefit further from an increase.
 ### Interesting error
@@ -113,10 +113,14 @@ During the implementation, a lot of interesting bug showed. One of my favorite i
 While implementing the final section, my first approach was to sort the velocity and position vectors using the same keys we used to sort the index. After implementing this, it turned out to be slower than the regular uniform grid approach. I believe this is because thrust wasn't great at handling large data (requiring too many reads to sort). On profiling the code, as expected the majority of the time (by a large margin) was spent in the sort function. The issue was that only 25% of the GPU was being utilized. After changing this to use a custom reshuffle function, the performance went back up again.
 ## Questions and Answers
 * **Question**: For each implementation, how does changing the number of boids affect performance? Why do you think this is?
-**Answer**: For each implementation, Increasing the number of boids to simulate has a negative impact on performance. This happens because with an increase in the number of boids, there is an increase in the number of neighbors each cell has, the more time it takes to compute the resultant velocity.
+
+* **Answer**: For each implementation, Increasing the number of boids to simulate has a negative impact on performance. This happens because with an increase in the number of boids, there is an increase in the number of neighbors each cell has, the more time it takes to compute the resultant velocity.
 * **Question**: For each implementation, how does changing the block count and block size affect performance? Why do you think this is?
-**Answer**: For both grid implementations, there is a performance increase (up to a point) with an increase in block size. After a point (64 in my case), it doesn't seem to have any noticeable improvement. For the naive approach, there didn't seem to be any change in performance while increasing the block size.
+
+* **Answer**: For both grid implementations, there is a performance increase (up to a point) with an increase in block size. After a point (64 in my case), it doesn't seem to have any noticeable improvement. For the naive approach, there didn't seem to be any change in performance while increasing the block size.
 * **Question**: For the coherent uniform grid: did you experience any performance improvements with the more coherent uniform grid? Was this the outcome you expected? Why or why not?
-**Answer**: There was a performance improvements by using the coherent uniform grid approach. The improvement is most noticeable when the number of particles becomes large (50k in my case). When this happens, the access time becomes more than the time required to rearrange the position and velocity vectors.
+
+* **Answer**: There was a performance improvements by using the coherent uniform grid approach. The improvement is most noticeable when the number of particles becomes large (50k in my case). When this happens, the access time becomes more than the time required to rearrange the position and velocity vectors.
 * **Question**:Did changing cell width and checking 27 vs 8 neighboring cells affect performance? Why or why not? Be careful: it is insufficient (and possibly incorrect) to say that 27-cell is slower simply because there are more cells to check!
-**Answer**: If we only increasing the cell width results in a drop in performs. This is because with an increase in cell width, the number of boids to check could potentially go up (even more likely with a large number of boids to simulate). Similarly, if we only change the number of cells to check from 8 to 27, there could be a performance hit (shown in the Analyze section).
+
+* **Answer**: If we only increasing the cell width results in a drop in performs. This is because with an increase in cell width, the number of boids to check could potentially go up (even more likely with a large number of boids to simulate). Similarly, if we only change the number of cells to check from 8 to 27, there could be a performance hit (shown in the Analyze section).
