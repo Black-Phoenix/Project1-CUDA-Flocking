@@ -92,23 +92,35 @@ This method builds upon the previous method, with the main difference being it m
 ### Results
 Below is a video of the particles flocking.
 ![Flocking boids](images/med_obj_count_v2.gif)
+
 ### Analysis
 To analyze the performance of the 3 methods, FPS data was collected for various numbers of boids. These plots are shown below. One was collected with the visualization turned on while the other had the visualization turned off.
+
 ![FPS with visualization](images/plots/with_viz.png)
+
 ![FPS without visualization](images/plots/without_viz.png)
+
 Next, data was collected for different block sizes, to see the difference it has
+
 ![FPS vs Block size with visualization](images/plots/block_size_with_viz.png)
+
 Finally, data was collected for different neighborhood sizes, 8 and 27 cells around the current boid.
+
 ![FPS vs neighborhood without visualization](images/plots/neighbors_without_viz.png)
+
 ## Interesting Observations
 ### Change in the number of object
 As expected, coherent grid method performs the best when the number of boids increase. For lower counts of boids, the coherent grid method performs similarly to the uniform grid method. For very low values (like 1000), not many boids have a single cell within their distance of influence so it takes a long time to form clusters, shown below
+
 ![Low count boids](images/low_obj_count.gif)
+
 ### Block size increase 
 Increasing the block size has an effect on the performance up to some point. After which, the performance does not benefit further from an increase.
 ### Interesting error
 During the implementation, a lot of interesting bug showed. One of my favorite is shown below. This was caused because of an error in the reshuffling portion of the coherent grid method.
+
 ![Fail](images/spinning_circles.gif)
+
 ### Sorting approach to the Coherent uniform grid method
 While implementing the final section, my first approach was to sort the velocity and position vectors using the same keys we used to sort the index. After implementing this, it turned out to be slower than the regular uniform grid approach. I believe this is because thrust wasn't great at handling large data (requiring too many reads to sort). On profiling the code, as expected the majority of the time (by a large margin) was spent in the sort function. The issue was that only 25% of the GPU was being utilized. After changing this to use a custom reshuffle function, the performance went back up again.
 ## Questions and Answers
