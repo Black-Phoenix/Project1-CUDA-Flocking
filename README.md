@@ -96,5 +96,4 @@ As expected, coherent grid method performs the best when the number of boids inc
 Increasing the block size has an effect on the performance upto some point. After which, the performance does not benifit further from an increase.
 ### Interesting error
 During the implementation, a lot of interesting bug showed. One of my favorate is shown below. This was caused because of an error in the reshuffeling portion of the coherent grid method.
-[Fail][fail]
-[fail]: images/spinning_circles.gif
+![Fail](images/spinning_circles.gif)
